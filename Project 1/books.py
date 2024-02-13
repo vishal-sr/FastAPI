@@ -15,6 +15,11 @@ async def first_api():
     return {"message": "Hello Vishal!"}
 
 
+@app.get("/books/")
+async def get_all_books():
+    return {"books": bks}
+
+
 @app.get("/book/{author}")
 async def get_book_by_author(author: str):
     bs = [book for book in bks if book["author"] == author]
@@ -31,3 +36,12 @@ async def get_book_by_rating_gt(rating: int):
 async def create_new_book(newBook: dict = Body()):
     bks.append(newBook)
     return {"message": "New book added to books"}
+
+
+@app.put("/book/")
+async def update_book(dataToUpdate: dict = Body()):
+    for i in range(len(bks)):
+        if bks[i]["title"].casefold() == dataToUpdate["title"].casefold():
+            bks[i] = dataToUpdate
+            print(bks)
+            return {"message": "Successfully updated!!!"}
