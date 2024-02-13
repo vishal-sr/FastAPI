@@ -25,3 +25,9 @@ async def get_book_by_author(author: str):
 async def get_book_by_rating_gt(rating: int):
     bs = [book for book in bks if book["rating"] > rating]
     return {"books": bs}
+
+
+@app.post("/books/")
+async def create_new_book(newBook: dict = Body()):
+    bks.append(newBook)
+    return {"message": "New book added to books"}
