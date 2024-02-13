@@ -45,3 +45,11 @@ async def update_book(dataToUpdate: dict = Body()):
             bks[i] = dataToUpdate
             print(bks)
             return {"message": "Successfully updated!!!"}
+
+
+@app.delete("/book/{bookTitle}")
+async def update_book(bookTitle: str):
+    for i in range(len(bks)):
+        if bks[i]["title"].casefold() == bookTitle.casefold():
+            bks.pop(i)
+            return {"message": "Successfully deleted!!!"}
