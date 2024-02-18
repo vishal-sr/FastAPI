@@ -1,6 +1,7 @@
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, Path, Query, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional
+from starlette import status
 
 app = FastAPI()
 
@@ -47,38 +48,40 @@ books = [
 ]
 
 
-@app.get("/")
+@app.get("/", status_code=status.HTTP_200_OK)
 async def get_all_books():
     return books
 
 
-@app.post("/create-book/")
+@app.post("/create-book/", status_code=status.HTTP_201_CREATED)
 async def create_book(book: Book):
     book = Book(**book.model_dump())
     book.id = next_book_id()
     books.append(book)
 
 
-@app.get("/book/{bookID}/")
-async def get_book_by_id(bookID: int) -> Book:
+@app.get("/book/{bookID}/", status_code=status.HTTP_200_OK)
+async def get_book_by_id(bookID: int = Path(gt=0)):
     for book in books:
         if book.id == bookID:
             return book
 
+    return HTTPException(status_code=404, detail="Book not found")
 
-@app.get("/books/")
-async def filter_books_by_rating(rating: int) -> list[Book]:
+
+@app.get("/books/", status_code=status.HTTP_200_OK)
+async def filter_books_by_rating(rating: int = Query(gt=0, lt=6)) -> list[Book]:
     return [book for book in books if book.rating == rating]
 
 
-@app.put("/book/update-book/")
+@app.put("/book/update-book/", status_code=status.HTTP_201_CREATED)
 async def update_book(book: Book):
     for i, bk in enumerate(books):
         if bk.id == book.id:
             books[i] = book
 
 
-@app.delete("/book/delete")
+@app.delete("/book/delete", status_code=status.HTTP_202_ACCEPTED)
 async def delete_book_by_id(id: int):
     for i, book in enumerate(books):
         if book.id == id:
